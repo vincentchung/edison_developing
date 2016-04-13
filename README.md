@@ -1,15 +1,15 @@
-# Amazon Alexa for Intel Edison
+# Amazon Alexa for Intel Edison added camera hand gesture
 
 ### About
 
-This project is based on the Sam Machin project, the Alexa Pi for the Raspberry Pi, for the Intel Edison.
-The idea was to port the original project to the Edison and use the MRAA library from Intel.
+This project is integrated Amazon Alexa in intel edison  and adding camera hand gesture to trigger voice record.
 
+This project is based on the Sam Machin project, the Alexa Pi for the Raspberry Pi, for the Intel Edison.
 Based on https://github.com/sammachin/AlexaPi
 
 ### Usage
 
-To build this project you'll need a USB sound card. The Intel Edison doesn't have integrated sound card.
+To build this project you'll need a USB sound card and USB camera support UVC. The Intel Edison doesn't have integrated sound card.
 
 ### Links
 
