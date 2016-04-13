@@ -122,9 +122,9 @@ def alexa():
 			led_status.write(0)
 
 def start():
-	last = camera_gesture_trigger()
+	last = mGestureTirgger
 	while True:
-		val = camera_gesture_trigger()
+		val = mGestureTirgger
 		if val != last:
 			last = val
 			if val == 0 and recorded == True:
@@ -280,7 +280,6 @@ def camera_gesture_thread( threadName, delay):
 		if counter > 5:
 			mGestureTirgger = 1 
 		
-		time.sleep(10)
 
 if __name__ == "__main__":
 	##MRAA output
@@ -299,10 +298,10 @@ if __name__ == "__main__":
 		led_status.write(1)
 		time.sleep(.1)
 		led_status.write(0)
-	#try:
-	#	thread.start_new_thread( camera_gesture_thread, ("Thread-1", 2, ) )
-	#except:
-	#	print "Error: unable to start thread"
+	try:
+		thread.start_new_thread( camera_gesture_thread, ("Thread-1", 2, ) )
+	except:
+		print "Error: unable to start thread"
    
 	start()
 	#camera_detect()
