@@ -3,9 +3,9 @@
 opkg update
 opkg install libasound2-dev python-pip mpg123 python-audio
 pip install -r requirements.txt
-cp initd_alexa.sh /etc/init.d/alexa
-cd /etc/rc5.d
-ln -s ../init.d/alexa S99alexa
+cp initd_alexa.sh /etc/alexa
+cd /etc
+ln -s ../alexa S99alexa
 touch /var/log/alexa.log
 
 #Install MRAA library from Intel GitHub
