@@ -14,6 +14,9 @@ import json
 import re
 import numpy as np
 import cv2
+import thread
+import time
+
 
 from memcache import Client
 
@@ -30,10 +33,12 @@ cap = cv2.VideoCapture(0) #openCV camera device
 device = "plughw:3,0" # Name of your microphone/soundcard in arecord -L
 #Setup
 
-audio = ""
+counter = 0
 servers = ["127.0.0.1:11211"]
 mc = Client(servers, debug=1)
 path = os.path.realpath(__file__).rstrip(os.path.basename(__file__))
+mGestureTirgger = 0
+
 
 def internet_on():
     print "Checking Internet Connection"
@@ -117,9 +122,9 @@ def alexa():
 			led_status.write(0)
 
 def start():
-	last = button.read()
+	last = camera_gesture_trigger()
 	while True:
-		val = button.read()
+		val = camera_gesture_trigger()
 		if val != last:
 			last = val
 			if val == 0 and recorded == True:
@@ -149,6 +154,39 @@ def start():
 				if l:
 					audio += data
 
+					
+def camera_gesture_trigger():
+	# Capture frame-by-frame
+	ret, frame = cap.read()
+	# Our operations on the frame come here
+	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+	blur = cv2.GaussianBlur(gray,(5,5),0)
+	ret,thresh1 = cv2.threshold(blur,70,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+		
+	contours, hierarchy = cv2.findContours(thresh1,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+	max_area=0
+	   
+	for i in range(len(contours)):
+		cnt=contours[i]
+		area = cv2.contourArea(cnt)
+		if(area>max_area):
+			max_area=area
+			ci=i
+	cnt=contours[ci]
+	hull = cv2.convexHull(cnt)
+	moments = cv2.moments(cnt)
+
+	cnt = cv2.approxPolyDP(cnt,0.01*cv2.arcLength(cnt,True),True)
+	hull = cv2.convexHull(cnt,returnPoints = False)
+
+	defects = cv2.convexityDefects(cnt,hull)					
+	
+	if defects is not None:			
+		if defects.shape[0] >= 5:
+			return 1
+			
+	return 0
+	
 def camera_detect():
 	global audio
 	recorded = False
@@ -226,7 +264,23 @@ def camera_detect():
 	cap.release()
 	cv2.destroyAllWindows()
 
-
+def camera_gesture_thread( threadName, delay):
+	global mGestureTirgger
+	print "start camera thread!!"
+	trigger = 0
+	counter = 0
+	while True:
+		trigger = camera_gesture_trigger()
+		if trigger == 1:
+			counter+=1
+		else:
+			counter = 0
+			mGestureTirgger = 0
+			
+		if counter > 5:
+			mGestureTirgger = 1 
+		
+		time.sleep(10)
 
 if __name__ == "__main__":
 	##MRAA output
@@ -245,6 +299,11 @@ if __name__ == "__main__":
 		led_status.write(1)
 		time.sleep(.1)
 		led_status.write(0)
-	#start()
-	camera_detect()
+	#try:
+	#	thread.start_new_thread( camera_gesture_thread, ("Thread-1", 2, ) )
+	#except:
+	#	print "Error: unable to start thread"
+   
+	start()
+	#camera_detect()
 	
