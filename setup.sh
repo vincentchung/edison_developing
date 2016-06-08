@@ -1,7 +1,7 @@
 #! /bin/bash
 
 opkg update
-opkg install libasound2-dev python-pip mpg123 alsa-utils alsa-lib-dev  python-audio
+opkg install libasound2-dev python-pip mpg123 alsa-utils alsa-lib-dev  python-audio python-opencv
 pip install -r requirements.txt
 cp initd_alexa.sh /etc/alexa
 cd /etc
